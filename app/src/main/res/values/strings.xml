@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">BurgerShotApp</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="SignIn">Sign In</string>
+    <string name="donthaveAccount">Don't have an account? </string>
+    <string name="signUp">Sign Up</string>
+    <string name="alreadHaveAnAccount">Already Have an Account ? </string>
+    <string name="username">Username</string>
+    <string name="confirmPassword">Confirm Password</string>
+
+    
+</resources>
