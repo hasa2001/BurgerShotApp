@@ -3,11 +3,17 @@
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="SignIn">Sign In</string>
-    <string name="donthaveAccount">Don't have an account? </string>
+    <string name="donthaveAccount">Dont have an account ? </string>
     <string name="signUp">Sign Up</string>
     <string name="alreadHaveAnAccount">Already Have an Account ? </string>
     <string name="username">Username</string>
     <string name="confirmPassword">Confirm Password</string>
+    <string name="forgotPassword">Forgot Password</string>
+    <string name="reset">Reset</string>
+    <string name="cancel">Cancel</string>
+    <string name="enter_email_for_password_reset">Enter Email for password Reset</string>
+    <string name="signInWithGoogle">Sign In With Google</string>
+    <string name="web_client_id">283761979759-eai3o1dec2e6fpbjt3g1l9m4bhq7sc1h.apps.googleusercontent.com</string>
 
-    
+
 </resources>
