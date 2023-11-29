@@ -3,7 +3,7 @@ package com.zaviron.burgershotapp.model;
 public class Product {
     private String id;
     private String name;
-    private  String quantity;
+    private  int quantity;
     private String description;
     private String price;
     private String category;
@@ -17,7 +17,7 @@ public class Product {
 
     }
 
-    public Product(String id, String name, String quantity, String description, String price, String category, String image, boolean visibility) {
+    public Product(String id, String name, int quantity, String description, String price, String category, String image, boolean visibility) {
         this.id = id;
         this.name = name;
         this.quantity = quantity;
@@ -46,11 +46,11 @@ public class Product {
         this.name = name;
     }
 
-    public String getQuantity() {
+    public int getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(String quantity) {
+    public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
 

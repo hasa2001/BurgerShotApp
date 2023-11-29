@@ -1,6 +1,7 @@
 package com.zaviron.burgershotapp.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -33,9 +35,10 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     private ArrayList<Cart> carts;
     private FirebaseStorage storage;
     private Context context;
-
+    private double totalCartPrice;
     private FirebaseFirestore firestore;
     private FirebaseAuth firebaseAuth;
+
 
     public CartAdapter(ArrayList<Cart> carts, Context context) {
         this.carts = carts;
@@ -54,16 +57,36 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         return new ViewHolder(view);
     }
 
+    private void updateTotalPrice() {
+        totalCartPrice = 0;
+        for (Cart cart : carts) {
+            totalCartPrice += Double.parseDouble(cart.getProduct_price()) * (double) cart.getSelected_qty();
+        }
+        Intent intent = new Intent("TotalCartAmount");
+        intent.putExtra("totalPrice", totalCartPrice);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
     @Override
     public void onBindViewHolder(@NonNull CartAdapter.ViewHolder holder, int position) {
 
         Cart cart = carts.get(position);
+        updateTotalPrice();
+        //  totalCartPrice =totalCartPrice+ Double.parseDouble(carts.get(position).getProduct_price()) * (double) carts.get(position).getSelected_qty();
 
         firestore = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
         holder.productTitle.setText(cart.getProduct_title().toString());
         holder.ProductPrice.setText(cart.getProduct_price().toString());
         holder.ProductQty.setText(String.valueOf(cart.getSelected_qty()));
+
+
+//
+//        Intent intent = new Intent("TotalCartAmount");
+//        intent.putExtra("totalPrice",totalCartPrice);
+//        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+
+
         storage.getReference("product-images/" + cart.getProduct_id()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
@@ -96,6 +119,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                                     public void onSuccess(Void unused) {
 
                                         carts.remove(position);
+                                        notifyDataSetChanged();
+                                        updateTotalPrice();
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                                     @Override
@@ -104,7 +129,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                                     }
                                 });
                             }
-                         CartAdapter.this.notifyDataSetChanged();
+                            CartAdapter.this.notifyDataSetChanged();
                         }
                     }
                 });

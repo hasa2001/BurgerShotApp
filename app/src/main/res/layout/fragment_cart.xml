@@ -24,9 +24,8 @@
         android:id="@+id/cartTotalPrice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="$99.99"
         android:layout_gravity="bottom|start"
         android:layout_margin="10dp"
-        android:textSize="30sp"
-        />
+        android:text="0.00LKR"
+        android:textSize="30sp" />
 </FrameLayout>
