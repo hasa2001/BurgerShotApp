@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:id="@+id/sideNaveGroupMain">
+    <group android:id="@+id/sideNaveGroupMain" android:checkableBehavior="single">
         <item
             android:id="@+id/sideNavHome"
             android:icon="@drawable/baseline_home_24_icon_for_bottom_navigation"
             android:title="@string/home"
-            android:checked="true"/>
+            />
 
-
-    </group>
-
-    <group android:id="@+id/sideNaveGroupAuth">
         <item
             android:id="@+id/sideNavLogin"
             android:icon="@drawable/baseline_login_24"
             android:title="@string/login" />
+    </group>
+
+    <group android:id="@+id/sideNaveGroupAuth" android:checkableBehavior="single">
         <item
             android:id="@+id/sideLogout"
             android:icon="@drawable/baseline_logout_24"
             android:title="@string/signOut"
             android:visible="false"/>
+
+
+
     </group>
 
 </menu>

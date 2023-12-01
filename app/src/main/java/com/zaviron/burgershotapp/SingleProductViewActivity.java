@@ -20,6 +20,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -93,6 +95,7 @@ public class SingleProductViewActivity extends AppCompatActivity {
 //            product_price.setText(price+"LKR");
 
             storage = FirebaseStorage.getInstance();
+            user = FirebaseAuth.getInstance().getCurrentUser();
 
 
             storage.getReference("product-images/" + image).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -136,33 +139,112 @@ public class SingleProductViewActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     int select_quantity = Integer.parseInt(selected_qty.getText().toString());
-                    user = FirebaseAuth.getInstance().getCurrentUser();
+
                     String cart_id = UUID.randomUUID().toString();
                     String user_id = user.getUid();
 
-                    Cart cart = new Cart(cart_id, user_id, product_id, select_quantity, name, price);
 
-                    firestore.collection("cart").add(cart).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+
+
+                    firestore.collection("cart").whereNotEqualTo("product_id", product_id).whereEqualTo("client_id", user_id).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
                         @Override
-                        public void onSuccess(DocumentReference documentReference) {
-                            Toast.makeText(getApplicationContext(), "Product Added to cart Successfully", Toast.LENGTH_LONG).show();
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (DocumentSnapshot snapshot : task.getResult()) {
+                                    Cart cart = new Cart(cart_id, user_id, product_id, select_quantity, name, price);
+                                    firestore.collection("cart").add(cart).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                        @Override
+                                        public void onSuccess(DocumentReference documentReference) {
+                                            Toast.makeText(getApplicationContext(), "Product Added to cart Successfully", Toast.LENGTH_LONG).show();
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+
+                                }
+                                Toast.makeText(getApplicationContext(), "Product is already added to the cart", Toast.LENGTH_LONG).show();
+                            }
+
+
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG).show();
+
                         }
                     });
+
 
                 }
             });
 
+            findViewById(R.id.addTowishList).setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    if (user != null) {
+                        int select_quantity = Integer.parseInt(selected_qty.getText().toString());
+
+                        String cart_id = UUID.randomUUID().toString();
+                        String user_id = user.getUid();
+
+                        firestore.collection("wishlist").whereNotEqualTo("product_id", product_id).whereEqualTo("client_id", user_id).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (DocumentSnapshot snapshot : task.getResult()) {
+//                                        Cart cart = snapshot.toObject(Cart.class);
+//                                        System.out.println(cart.getProduct_id());
+//                                        System.out.println(cart.getClient_id());
+//                                        System.out.println("LOL");
+
+                                        Cart cart = new Cart(cart_id, user_id, product_id, select_quantity, name, price);
+
+                                        firestore.collection("wishlist").add(cart).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                            @Override
+                                            public void onSuccess(DocumentReference documentReference) {
+                                                Toast.makeText(getApplicationContext(), "Product Added to wishlist Successfully", Toast.LENGTH_LONG).show();
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG).show();
+                                            }
+                                        });
+                                    }
+                                    System.out.println("product already exists");
+                                } else {
+
+                                }
+
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                System.out.println("product failed");
+                            }
+                        });
+
+
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Please sign in first", Toast.LENGTH_LONG).show();
+                        startActivity(new Intent(getApplicationContext(), SignInActivity.class));
+                    }
+
+                }
+            });
             findViewById(R.id.buy).setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
                     FirebaseUser currentUser = mAuth.getCurrentUser();
                     if (currentUser != null) {
+
+
                         firestore.collection("items").whereEqualTo("id", product_id).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             int available_total_product_qty;
                             String document_id;
@@ -200,7 +282,7 @@ public class SingleProductViewActivity extends AppCompatActivity {
                                     firestore.collection("items").document(document_id).update("quantity", remaining_total_product_qty).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void unused) {
-                                            Toast.makeText(getApplicationContext(),  "success", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(getApplicationContext(), "success", Toast.LENGTH_LONG).show();
                                             System.out.println("success");
                                             double total_price = selected_product_qty * Double.parseDouble(price);
                                             String order_id = UUID.randomUUID().toString();

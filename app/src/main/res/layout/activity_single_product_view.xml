@@ -21,12 +21,12 @@
 
     <TextView
         android:id="@+id/productTitle"
-        android:gravity="center"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="8dp"
+        android:gravity="center"
         android:text="Title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -151,7 +151,21 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/add_to_cart" />
+
         </LinearLayout>
+
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/addTowishList"
+        android:layout_width="22dp"
+        android:layout_height="17dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/productTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/singleProductImageView"
+        app:srcCompat="@drawable/baseline_favorite_24_for_bottom_navigation" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

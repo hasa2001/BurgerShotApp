@@ -3,13 +3,51 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".HomeFragment"
-    android:id="@+id/home"
-    >
+    android:id="@+id/home">
+
+<!--    <SearchView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="40dp"-->
+
+<!--        />-->
+<androidx.appcompat.widget.SearchView
+    android:id="@+id/searchViewBar"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:background="@drawable/custom_input_search"
+    android:drawableStart="@drawable/baseline_search_24_search_icon"
+    android:layout_marginStart="10dp"
+    android:layout_marginEnd="10dp"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="8dp"
+    android:hint="@string/search_hint"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp"
+    android:textSize="14sp"
+    app:iconifiedByDefault="false"
+    />
+<!--    <TextView-->
+<!--        android:id="@+id/textInputSearch"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="40dp"-->
+<!--        android:layout_marginStart="10dp"-->
+<!--        android:layout_marginEnd="10dp"-->
+<!--        android:background="@drawable/custom_input_search"-->
+<!--        android:drawableStart="@drawable/baseline_search_24_search_icon"-->
+<!--        android:hint="@string/search_hint"-->
+<!--        android:paddingStart="10dp"-->
+<!--        android:paddingEnd="10dp"-->
+<!--        android:textSize="14sp"-->
+<!--        android:layout_marginTop="10dp"/>-->
 
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_marginTop="50dp" />
+
+
 </FrameLayout>

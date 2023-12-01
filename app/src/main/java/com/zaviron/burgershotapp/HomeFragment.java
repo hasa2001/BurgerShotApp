@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,6 +19,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -35,7 +37,8 @@ public class HomeFragment extends Fragment {
     private FirebaseStorage storage;
 
     private ArrayList<Product> products;
-
+    private SearchView searchView;
+    private ProductAdapter productAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,34 +53,69 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View fragment, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(fragment, savedInstanceState);
 
+        searchView = fragment.findViewById(R.id.searchViewBar);
+        searchView.clearFocus();
         firestore = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
         products = new ArrayList<>();
         RecyclerView itemView = fragment.findViewById(R.id.recyclerView);
-        ProductAdapter productAdapter = new ProductAdapter(products, getContext());
-        GridLayoutManager gridLayoutManager =new GridLayoutManager(getContext(),2);
+         productAdapter = new ProductAdapter(products, getContext());
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
         itemView.setLayoutManager(gridLayoutManager);
         itemView.setAdapter(productAdapter);
 
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
 
+            @Override
+            public boolean onQueryTextChange(String text) {
+                search(text);
+                return false;
+            }
+        });
 
         firestore.collection("items").addSnapshotListener(new EventListener<QuerySnapshot>() {
 
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-         //  products.clear();
-                for (DocumentChange change: value.getDocumentChanges()){
+                //  products.clear();
+                for (DocumentChange change : value.getDocumentChanges()) {
                     Product product = change.getDocument().toObject(Product.class);
-                    switch (change.getType()){
+                    switch (change.getType()) {
                         case ADDED:
                             products.add(product);
                         case MODIFIED:
-                        break;
+                            break;
                         case REMOVED:
                             products.remove(product);
                     }
                 }
-           productAdapter.notifyDataSetChanged();
+                productAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    public void search(String text){
+        firestore.collection("items").whereGreaterThanOrEqualTo("name",text).addSnapshotListener(new EventListener<QuerySnapshot>() {
+
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                 products.clear();
+                for (DocumentChange change : value.getDocumentChanges()) {
+                    Product product = change.getDocument().toObject(Product.class);
+                    switch (change.getType()) {
+                        case ADDED:
+                            products.add(product);
+                        case MODIFIED:
+                            break;
+                        case REMOVED:
+                            products.remove(product);
+                    }
+                }
+                productAdapter.notifyDataSetChanged();
             }
         });
     }
