@@ -11,11 +11,17 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -25,6 +31,8 @@ import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -32,7 +40,7 @@ import com.squareup.picasso.Picasso;
 import com.zaviron.burgershotapp.databinding.ActivityMainBinding;
 
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NavigationBarView.OnItemSelectedListener {
 
     public static final String TAG = MainActivity.class.getName();
     private FirebaseAuth firebaseAuth;
@@ -42,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private MaterialToolbar toolbar;
-
+    private BottomNavigationView bottomNavigationView;
 
 
     @SuppressLint("NonConstantResourceId")
@@ -50,34 +58,55 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(layout.activity_main);
+
         drawerLayout = findViewById(id.mainDrawerLayout);
         navigationView = findViewById(id.navigationView);
         toolbar = findViewById(id.toolBar);
-        user =FirebaseAuth.getInstance().getCurrentUser();
 
-        setSupportActionBar(toolbar);
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(MainActivity.this, drawerLayout,toolbar, R.string.open_nav, R.string.close_nav);
+        // setSupportActionBar(toolbar);
+        // binding = ActivityMainBinding.inflate(getLayoutInflater());
+        //  setContentView(binding.getRoot());
+
+        user = FirebaseAuth.getInstance().getCurrentUser();
+
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(MainActivity.this, drawerLayout, toolbar, R.string.open_nav, R.string.close_nav);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                navigationView.setCheckedItem(id.sideNavHome);
+                // navigationView.setCheckedItem(id.sideNavHome);
                 drawerLayout.open();
             }
         });
 
+        //navigationView.setNavigationItemSelectedListener(this);
+
+
+//        replaceFragment(new HomeFragment());
+//        binding.bottomNavigation.setBackground(null);
+//
+//        binding.bottomNavigation.setOnItemSelectedListener(item -> {
+//            if (item.getItemId() == R.id.homeIconId) {
+//                replaceFragment(new HomeFragment());
+//            } else if (item.getItemId() == R.id.cart) {
+//                replaceFragment(new CartFragment());
+//            } else if (item.getItemId() == R.id.wishlist) {
+//                replaceFragment(new WishlistFragment());
+//            } else if (item.getItemId() == R.id.orders) {
+//                replaceFragment(new OrdersFragment());
+//            }
+//            return true;
+//
+//        });
         navigationView.setNavigationItemSelectedListener(this);
-
-
-
+        bottomNavigationView = findViewById(id.bottomNavigation);
+        bottomNavigationView.setBackground(null);
         replaceFragment(new HomeFragment());
-        binding.bottomNavigation.setBackground(null);
-
-        binding.bottomNavigation.setOnItemSelectedListener(item -> {
+        navigationView.setCheckedItem(id.sideNavHome);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
             if (item.getItemId() == R.id.homeIconId) {
                 replaceFragment(new HomeFragment());
             } else if (item.getItemId() == R.id.cart) {
@@ -88,18 +117,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 replaceFragment(new OrdersFragment());
             }
             return true;
-
         });
-        // navigationView.setNavigationItemSelectedListener(this);
-//        navigationView.setCheckedItem(id.sideNavHome);
 
 
-        if (user !=null){
-            System.out.println("wada");
+        Menu menu = navigationView.getMenu();
+
+
+        if (user != null) {
+
+            menu.findItem(id.sideNavLogin).setVisible(false);
+            menu.findItem(id.sideLogout).setVisible(true);
+            menu.findItem(id.profile).setVisible(true);
             View headerView = navigationView.getHeaderView(0);
             ImageView sideNavPic = headerView.findViewById(id.profilePic);
-            TextView  username =headerView.findViewById(id.side_nav_username);
-            TextView email =headerView.findViewById(id.side_nav_user_email);
+            TextView username = headerView.findViewById(id.side_nav_username);
+            TextView email = headerView.findViewById(id.side_nav_user_email);
+
 
             username.setText(user.getDisplayName());
             email.setText(user.getEmail());
@@ -110,15 +143,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .into(sideNavPic);
 
 
-
-
         }
 
-    }
 
-    @Override
-    public void setSupportActionBar(@Nullable androidx.appcompat.widget.Toolbar toolbar) {
-        super.setSupportActionBar(toolbar);
     }
 
 
@@ -131,24 +158,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        Log.i(TAG,item.toString());
+        Log.i(TAG, item.toString());
         int itemId = item.getItemId();
         if (itemId == id.sideNavHome) {
-            Log.i(TAG,String.valueOf(item.getGroupId()));
+            Log.i(TAG, String.valueOf(item.getGroupId()));
             replaceFragment(new HomeFragment());
         } else if (itemId == id.sideNavLogin) {
 
-            Log.i(TAG,String.valueOf(item.getGroupId()));
-            Toast.makeText(getApplicationContext(), "Login", Toast.LENGTH_LONG).show();
-            //  startActivity(new Intent(MainActivity.this, SignInActivity.class));
+            Log.i(TAG, String.valueOf(item.getGroupId()));
+
+            startActivity(new Intent(MainActivity.this, SignInActivity.class));
 
         } else if (itemId == id.sideLogout) {
-            // startActivity(new Intent(MainActivity.this, SignInActivity.class));
-            Toast.makeText(getApplicationContext(), "Log Out", Toast.LENGTH_LONG).show();
-            Log.i(TAG,String.valueOf(item.getGroupId())+"Hello");
+            FirebaseAuth.getInstance().signOut();
 
+            startActivity(new Intent(MainActivity.this, MainActivity.class));
+            finish();
+            Log.i(TAG, String.valueOf(item.getGroupId()) + "log out");
+
+        } else if (itemId==id.profile) {
+
+
+        } else if (itemId==id.location) {
+
+        } else if (itemId==id.contact) {
+            startActivity(new Intent(Intent.ACTION_DIAL,Uri.parse("tel:0705136124")));
         }
         return true;
     }
+
 
 }

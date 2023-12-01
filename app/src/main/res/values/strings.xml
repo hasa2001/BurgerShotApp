@@ -28,6 +28,11 @@
     <string name="price">Price</string>
     <string name="open_nav">Open Navigation</string>
     <string name="close_nav">Close Navigation</string>
+    <string name="nav_header_desc">Navigation Header</string>
+    <string name="nav_header_title">Android\n</string>
+    <string name="profile">Profile</string>
+    <string name="locate_us">Locate Us</string>
+    <string name="contact_us">Contact Us</string>
 
 
 </resources>

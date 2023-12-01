@@ -1,25 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:id="@+id/sideNaveGroupMain" android:checkableBehavior="single">
+    <group
+        android:id="@+id/sideNaveGroupMain"
+        android:checkableBehavior="single">
         <item
             android:id="@+id/sideNavHome"
             android:icon="@drawable/baseline_home_24_icon_for_bottom_navigation"
-            android:title="@string/home"
-            />
+            android:title="@string/home" />
 
+
+    </group>
+
+
+    <group
+        android:id="@+id/sideNaveGroupAuth"
+        android:checkableBehavior="single">
         <item
             android:id="@+id/sideNavLogin"
             android:icon="@drawable/baseline_login_24"
-            android:title="@string/login" />
-    </group>
-
-    <group android:id="@+id/sideNaveGroupAuth" android:checkableBehavior="single">
+            android:title="@string/login"
+            android:visible="true" />
         <item
             android:id="@+id/sideLogout"
             android:icon="@drawable/baseline_logout_24"
             android:title="@string/signOut"
-            android:visible="false"/>
+            android:visible="false" />
 
+
+    </group>
+    <group
+        android:id="@+id/user_details"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/profile"
+            android:icon="@drawable/baseline_account_circle_24"
+            android:title="@string/profile"
+            android:visible="false"
+
+            />
+    </group>
+
+    <group
+        android:id="@+id/contact_us"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/location"
+            android:icon="@drawable/baseline_location_on_24"
+            android:title="@string/locate_us"
+            android:visible="true" />
+        <item
+            android:id="@+id/contact"
+            android:icon="@drawable/baseline_call_24"
+            android:title="@string/contact_us"
+            android:visible="true" />
 
 
     </group>
