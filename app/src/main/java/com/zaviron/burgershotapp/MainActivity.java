@@ -180,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         } else if (itemId==id.location) {
+            startActivity(new Intent(MainActivity.this, MapActivity.class));
 
         } else if (itemId==id.contact) {
             startActivity(new Intent(Intent.ACTION_DIAL,Uri.parse("tel:0705136124")));

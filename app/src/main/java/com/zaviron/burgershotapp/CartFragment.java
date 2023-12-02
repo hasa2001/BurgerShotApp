@@ -17,7 +17,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,14 +27,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.zaviron.burgershotapp.adapter.CartAdapter;
-import com.zaviron.burgershotapp.adapter.ProductAdapter;
 import com.zaviron.burgershotapp.model.Cart;
 import com.zaviron.burgershotapp.model.Orders;
 import com.zaviron.burgershotapp.model.Product;
@@ -71,39 +68,41 @@ public class CartFragment extends Fragment {
 
         cartItems = new ArrayList<>();
         orders = new ArrayList<>();
-        RecyclerView recyclerView = fragment.findViewById(R.id.cartRecyclerView);
-        CartAdapter cartAdapter = new CartAdapter(cartItems, getContext());
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(cartAdapter);
-
         user = FirebaseAuth.getInstance().getCurrentUser();
-        String client_id = user.getUid();
-        Log.i(TAG, client_id);
-        firestore = FirebaseFirestore.getInstance();
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(broadcastReceiver, new IntentFilter("TotalCartAmount"));
+        if (user != null) {
+            RecyclerView recyclerView = fragment.findViewById(R.id.cartRecyclerView);
+            CartAdapter cartAdapter = new CartAdapter(cartItems, getContext());
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+            recyclerView.setLayoutManager(linearLayoutManager);
+            recyclerView.setAdapter(cartAdapter);
 
-        firestore.collection("cart").whereEqualTo("client_id", client_id).addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            String client_id = user.getUid();
+            Log.i(TAG, client_id);
+            firestore = FirebaseFirestore.getInstance();
+            LocalBroadcastManager.getInstance(getContext()).registerReceiver(broadcastReceiver, new IntentFilter("TotalCartAmount"));
 
-                for (DocumentChange change : value.getDocumentChanges()) {
-                    Cart cart = change.getDocument().toObject(Cart.class);
-                    switch (change.getType()) {
-                        case ADDED:
-                            cartItems.add(cart);
-                        case MODIFIED:
-                            break;
-                        case REMOVED:
-                            cartItems.remove(cart);
+            firestore.collection("cart").whereEqualTo("client_id", client_id).addSnapshotListener(new EventListener<QuerySnapshot>() {
+                @Override
+                public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+
+                    for (DocumentChange change : value.getDocumentChanges()) {
+                        Cart cart = change.getDocument().toObject(Cart.class);
+                        switch (change.getType()) {
+                            case ADDED:
+                                cartItems.add(cart);
+                            case MODIFIED:
+                                break;
+                            case REMOVED:
+                                cartItems.remove(cart);
+                        }
                     }
+
+                    cartAdapter.notifyDataSetChanged();
                 }
+            });
 
-                cartAdapter.notifyDataSetChanged();
-            }
-        });
-
-        totalPrice = fragment.findViewById(R.id.cartTotalPrice);
+            totalPrice = fragment.findViewById(R.id.cartTotalPrice);
 
 //        firestore.collection("cart").whereEqualTo("client_id",client_id).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
 //            @Override
@@ -126,123 +125,138 @@ public class CartFragment extends Fragment {
 //        });
 
 
-        fragment.findViewById(R.id.cartBuyNowBtn).setOnClickListener(new View.OnClickListener() {
-
-            boolean shouldStopProcessing = false;
-
-            @Override
-            public void onClick(View v) {
-//in android recycle view data how to added firestore when fragment button clicked for this button click
-                // Orders orders1 =new Orders();
-                String order_id = UUID.randomUUID().toString();
-                Date date = new Date();
-                System.out.println(date);
+            fragment.findViewById(R.id.cartBuyNowBtn).setOnClickListener(new View.OnClickListener() {
 
 
-                firestore.collection("cart").whereEqualTo("client_id", client_id).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                @Override
+                public void onClick(View v) {
 
-                        int total_cart_item_size = task.getResult().getDocuments().size();
-                        System.out.println("total_cart_item_size "+total_cart_item_size);
-                        final int[] innerCount = {0};
-                        int outer_count = 0;
-                        for (QueryDocumentSnapshot snapshot : task.getResult()) {
-
-                            Cart cart = snapshot.toObject(Cart.class);
-
-                            firestore.collection("items").whereEqualTo("id", cart.getProduct_id()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    String order_id = UUID.randomUUID().toString();
+                    Date date = new Date();
+                    String user_id = user.getUid();
 
 
-                                    if (task.isSuccessful()) {
+                    firestore.collection("cart").whereEqualTo("client_id", client_id).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
-                                        for (QueryDocumentSnapshot snapshot : task.getResult()) {
 
-                                            Product product = snapshot.toObject(Product.class);
-                                            int product_available_qty = product.getQuantity();
-                                            int order_selected_qty = cart.getSelected_qty();
-                                            if (product_available_qty < order_selected_qty) {
-                                               Toast.makeText(getContext(), product.getName() + "Is not Available", Toast.LENGTH_LONG).show();
-                                                // i want stop out loop from this
-                                                System.out.println("LOL");
-                                                shouldStopProcessing = true;
-                                                break;
+                            final double[] total_cart_price = {0};
 
-                                            } else {
-                                                orders.add(new Orders(order_id, cart.getCart_id(), cart.getClient_id(), cart.getProduct_id(), cart.getProduct_title(), cart.getProduct_price(), cart.getSelected_qty(), date, totalPrice.getText().toString()));
-                                                System.out.println("OKKK");
-                                                innerCount[0]++;
-                                                System.out.println(innerCount[0]);
+
+                            int total_cart_item_size = task.getResult().getDocuments().size();
+                            int[] currentIteration = {0};
+
+                            for (QueryDocumentSnapshot snapshot : task.getResult()) {
+
+                                Cart cart = snapshot.toObject(Cart.class);
+
+                                firestore.collection("items").whereEqualTo("id", cart.getProduct_id()).whereGreaterThanOrEqualTo("quantity", cart.getSelected_qty()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    String document_id;
+
+                                    @Override
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            //  int total_cart_item_size = task.getResult().getDocuments().size();
+                                            //  int currentIteration = 0;
+                                            document_id = "";
+                                            for (QueryDocumentSnapshot snapshots : task.getResult()) {
+                                                ///   currentIteration++;
+                                                Product product = snapshots.toObject(Product.class);
+                                                int product_available_qty = product.getQuantity();
+                                                int order_selected_qty = cart.getSelected_qty();
+                                                int product_updated_quantity = product_available_qty - order_selected_qty;
+                                                document_id = snapshot.getId();
+                                                updateProductQty(document_id, product_updated_quantity);
+                                                double product_total_price = (double) order_selected_qty * Double.parseDouble(product.getPrice());
+                                                total_cart_price[0] += product_total_price;
+                                                Orders productOrders = new Orders(order_id, cart.getCart_id(), user_id, product.getId(), product.getName(), product.getPrice(), order_selected_qty, date, String.valueOf(product_total_price));
+                                                createOrder(order_id, productOrders);
+                                                deleteCartItems(document_id);
 
 
                                             }
+                                            currentIteration[0]++;
+                                            if (currentIteration[0] == total_cart_item_size) {
+                                                // This block will be executed when the loop is over
+                                                // You can perform any actions you need after the loop here
+                                                System.out.println(total_cart_price[0] + "outer");
+                                                //  currentIteration[0]=0;
+                                                Intent intent_order = new Intent(getContext(), OrderCompleteActivity.class);
+                                                intent_order.putExtra("user_name", user.getDisplayName());
+                                                intent_order.putExtra("order_id", order_id);
+                                                intent_order.putExtra("date", String.valueOf(date));
+                                                intent_order.putExtra("price", String.valueOf(total_cart_price[0]));
+
+                                                startActivity(intent_order);
+                                            }
 
                                         }
+
+
                                     }
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
+                                });
 
-                                }
-                            });
-
-
-                            if (shouldStopProcessing) {
-                                break;
-                               // System.out.println(orders.size() + "vamos argentina");
-                              //  orders.clear();
-
-
-
-                            } else {
-                                System.out.println("digatam wada");
-
-                                outer_count++;
 
                             }
-
-                        }
-
-                        if (!shouldStopProcessing) {
-                            System.out.println("inner count " + innerCount[0] + "outer count " + outer_count);
-                        }
-
-
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-
-                    }
-                });
-
-//                addSnapshotListener(new EventListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-//
-//                        for (DocumentChange change : value.getDocumentChanges()) {
-//                            Cart cart = change.getDocument().toObject(Cart.class);
-//                            switch (change.getType()) {
-//                                case ADDED:
-//                                    cartItems.add(cart.);
-//                                case MODIFIED:
-//                                    break;
-//                                case REMOVED:
-//                                    cartItems.remove(cart);
-//                            }
+//                        if (currentIteration[0] == total_cart_item_size) {
+//                            // This block will be executed when the loop is over
+//                            // You can perform any actions you need after the loop here
+//                            System.out.println(total_cart_price[0]+"outer");
 //                        }
-//
-//                        cartAdapter.notifyDataSetChanged();
-//                    }
-//                });
-            }
 
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+
+                        }
+                    });
+
+                }
+
+            });
+        }else {
+            startActivity(new Intent(getContext(), SignInActivity.class));
+            Toast.makeText(getContext(),"Please Sign In First",Toast.LENGTH_LONG).show();
+        }
+
+
+    }
+
+    private void deleteCartItems(String document_id) {
+        firestore.collection("cart").document(document_id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+           Log.i(TAG,"delete Success");
+            }
+        });
+    }
+
+    private void createOrder(String orderId, Orders orders) {
+        firestore.collection("orders").document(orderId).set(orders).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.i(TAG, "Order Adding Success");
+
+            }
         });
 
+    }
 
+    private void updateProductQty(String document_id, int productUpdatedQuantity) {
+        firestore.collection("items").document(document_id).update("quantity", productUpdatedQuantity).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.i(TAG, "Product Updating Success");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.i(TAG, "Failed");
+            }
+        });
     }
 
     public BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {

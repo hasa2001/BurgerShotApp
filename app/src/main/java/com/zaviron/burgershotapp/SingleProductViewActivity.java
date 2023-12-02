@@ -146,12 +146,12 @@ public class SingleProductViewActivity extends AppCompatActivity {
 
 
 
-                    firestore.collection("cart").whereNotEqualTo("product_id", product_id).whereEqualTo("client_id", user_id).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                  //  firestore.collection("cart").whereNotEqualTo("product_id", product_id).whereEqualTo("client_id", user_id).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
 
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()) {
-                                for (DocumentSnapshot snapshot : task.getResult()) {
+                   //     @Override
+                    //    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                          //  if (task.isSuccessful()) {
+                              //  for (DocumentSnapshot snapshot : task.getResult()) {
                                     Cart cart = new Cart(cart_id, user_id, product_id, select_quantity, name, price);
                                     firestore.collection("cart").add(cart).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                         @Override
@@ -165,18 +165,18 @@ public class SingleProductViewActivity extends AppCompatActivity {
                                         }
                                     });
 
-                                }
-                                Toast.makeText(getApplicationContext(), "Product is already added to the cart", Toast.LENGTH_LONG).show();
-                            }
+                            //    }
+                            //    Toast.makeText(getApplicationContext(), "Product is already added to the cart", Toast.LENGTH_LONG).show();
+                           // }
 
 
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-
-                        }
-                    });
+                 //       }
+//                    }).addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(@NonNull Exception e) {
+//
+//                        }
+//                    });
 
 
                 }

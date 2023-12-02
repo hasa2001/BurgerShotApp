@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'com.google.gms.google-services'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 }
 
 android {
@@ -56,5 +57,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:20.7.0")
     //picasso
     implementation 'com.squareup.picasso:picasso:2.8'
+    //google map SDK
+    implementation 'com.google.android.gms:play-services-maps:18.2.0'
 
 }
