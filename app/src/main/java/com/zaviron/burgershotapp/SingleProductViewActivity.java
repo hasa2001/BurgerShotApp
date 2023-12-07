@@ -1,5 +1,7 @@
 package com.zaviron.burgershotapp;
 
+import static java.security.AccessController.getContext;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -138,48 +140,54 @@ public class SingleProductViewActivity extends AppCompatActivity {
             findViewById(R.id.addToCart).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int select_quantity = Integer.parseInt(selected_qty.getText().toString());
+                    if (user!=null){
+                        int select_quantity = Integer.parseInt(selected_qty.getText().toString());
 
-                    String cart_id = UUID.randomUUID().toString();
-                    String user_id = user.getUid();
-
-
-
-
-                  //  firestore.collection("cart").whereNotEqualTo("product_id", product_id).whereEqualTo("client_id", user_id).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-
-                   //     @Override
-                    //    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                          //  if (task.isSuccessful()) {
-                              //  for (DocumentSnapshot snapshot : task.getResult()) {
-                                    Cart cart = new Cart(cart_id, user_id, product_id, select_quantity, name, price);
-                                    firestore.collection("cart").add(cart).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                        @Override
-                                        public void onSuccess(DocumentReference documentReference) {
-                                            Toast.makeText(getApplicationContext(), "Product Added to cart Successfully", Toast.LENGTH_LONG).show();
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG).show();
-                                        }
-                                    });
-
-                            //    }
-                            //    Toast.makeText(getApplicationContext(), "Product is already added to the cart", Toast.LENGTH_LONG).show();
-                           // }
+                        String cart_id = UUID.randomUUID().toString();
+                        String user_id = user.getUid();
 
 
-                 //       }
-//                    }).addOnFailureListener(new OnFailureListener() {
-//                        @Override
-//                        public void onFailure(@NonNull Exception e) {
-//
-//                        }
-//                    });
+                        firestore.collection("cart").whereEqualTo("product_id", product_id).whereEqualTo("client_id", user_id).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    if (task.getResult().isEmpty()) {
+                                        Cart cart = new Cart(cart_id, user_id, product_id, select_quantity, name, price);
+                                        firestore.collection("cart").add(cart).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                            @Override
+                                            public void onSuccess(DocumentReference documentReference) {
+                                                Toast.makeText(getApplicationContext(), "Product Added to cart Successfully", Toast.LENGTH_LONG).show();
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG).show();
+                                            }
+                                        });
+                                    } else {
+                                        Toast.makeText(getApplicationContext(), "Product is already added to the cart", Toast.LENGTH_LONG).show();
+                                    }
 
 
-                }
+                                }
+
+
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+
+                            }
+                        });
+
+
+                    }else {
+                        startActivity(new Intent(SingleProductViewActivity.this, SignInActivity.class));
+                        Toast.makeText(SingleProductViewActivity.this,"Please Sign In First",Toast.LENGTH_LONG).show();
+                    }
+                    }
+
             });
 
             findViewById(R.id.addTowishList).setOnClickListener(new View.OnClickListener() {
@@ -192,18 +200,12 @@ public class SingleProductViewActivity extends AppCompatActivity {
                         String cart_id = UUID.randomUUID().toString();
                         String user_id = user.getUid();
 
-                        firestore.collection("wishlist").whereNotEqualTo("product_id", product_id).whereEqualTo("client_id", user_id).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        firestore.collection("wishlist").whereEqualTo("product_id", product_id).whereEqualTo("client_id", user_id).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if (task.isSuccessful()) {
-                                    for (DocumentSnapshot snapshot : task.getResult()) {
-//                                        Cart cart = snapshot.toObject(Cart.class);
-//                                        System.out.println(cart.getProduct_id());
-//                                        System.out.println(cart.getClient_id());
-//                                        System.out.println("LOL");
-
+                                    if (task.getResult().isEmpty()) {
                                         Cart cart = new Cart(cart_id, user_id, product_id, select_quantity, name, price);
-
                                         firestore.collection("wishlist").add(cart).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                             @Override
                                             public void onSuccess(DocumentReference documentReference) {
@@ -216,6 +218,7 @@ public class SingleProductViewActivity extends AppCompatActivity {
                                             }
                                         });
                                     }
+
                                     System.out.println("product already exists");
                                 } else {
 

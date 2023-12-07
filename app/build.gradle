@@ -59,5 +59,9 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.8'
     //google map SDK
     implementation 'com.google.android.gms:play-services-maps:18.2.0'
+    //lottie animation
+    implementation group: 'com.airbnb.android', name: 'lottie', version: '6.2.0'
+    //splash screen
+    implementation "androidx.core:core-splashscreen:1.0.0"
 
 }

@@ -22,7 +22,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class SignUpActivity extends AppCompatActivity {
-    public final static String TAG =SignUpActivity.class.getName();
+    public final static String TAG = SignUpActivity.class.getName();
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firestore;
     private EditText signUpEmail, signUpPassword, username, signUpConfirmPassword;
@@ -32,15 +32,14 @@ public class SignUpActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        FirebaseUser currentUser=  firebaseAuth.getCurrentUser();
-        if(currentUser != null && currentUser.isEmailVerified()){
-            Intent intent =new Intent(SignUpActivity.this, MainActivity.class);
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        if (currentUser != null && currentUser.isEmailVerified()) {
+            Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
             startActivity(intent);
             Toast.makeText(getApplicationContext(), "You Already SignIn", Toast.LENGTH_LONG).show();
             finish();
-        }
-        else if (currentUser !=null &&
-                !currentUser.isEmailVerified()){
+        } else if (currentUser != null &&
+                !currentUser.isEmailVerified()) {
             Toast.makeText(getApplicationContext(), "Please Verify your Email", Toast.LENGTH_LONG).show();
             startActivity(new Intent(SignUpActivity.this, SignInActivity.class));
             finish();
@@ -54,7 +53,7 @@ public class SignUpActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_up);
         firestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
-        username = findViewById(R.id.username);
+        //    username = findViewById(R.id.username);
         signUpEmail = findViewById(R.id.singnupemail);
         signUpPassword = findViewById(R.id.password);
         signUpConfirmPassword = findViewById(R.id.confirmPassword);
@@ -64,14 +63,16 @@ public class SignUpActivity extends AppCompatActivity {
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String name = username.getText().toString();
+                //    String name = username.getText().toString();
                 String email = signUpEmail.getText().toString();
                 String password = signUpPassword.getText().toString();
                 String confirm_password = signUpConfirmPassword.getText().toString();
 
-                if (name.isEmpty()) {
-                    Toast.makeText(getApplicationContext(), "Please enter Username", Toast.LENGTH_LONG).show();
-                } else if (email.isEmpty()) {
+//                if (name.isEmpty()) {
+//                    Toast.makeText(getApplicationContext(), "Please enter Username", Toast.LENGTH_LONG).show();
+//                } else
+
+                if (email.isEmpty()) {
                     Toast.makeText(getApplicationContext(), "Please enter Email.", Toast.LENGTH_LONG).show();
 
                 } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
@@ -80,11 +81,9 @@ public class SignUpActivity extends AppCompatActivity {
                 } else if (password.isEmpty()) {
 
                     Toast.makeText(getApplicationContext(), "Please enter password", Toast.LENGTH_LONG).show();
-                }
-                else if (password.length() <= 8) {
+                } else if (password.length() <= 8) {
                     Toast.makeText(getApplicationContext(), "Password must be 8 characters or long", Toast.LENGTH_LONG).show();
-                }
-                else if (confirm_password.isEmpty()) {
+                } else if (confirm_password.isEmpty()) {
                     Toast.makeText(getApplicationContext(), "Please enter confirm password", Toast.LENGTH_LONG).show();
 
 
@@ -94,19 +93,19 @@ public class SignUpActivity extends AppCompatActivity {
                     System.out.println(password);
                 } else {
 
-                    firebaseAuth.createUserWithEmailAndPassword(email,password)
+                    firebaseAuth.createUserWithEmailAndPassword(email, password)
                             .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if (task.isSuccessful()){
-                                        FirebaseUser user =firebaseAuth.getCurrentUser();
+                                    if (task.isSuccessful()) {
+                                        FirebaseUser user = firebaseAuth.getCurrentUser();
                                         user.sendEmailVerification();
                                         Toast.makeText(getApplicationContext(), " Success Please Verify Your Email", Toast.LENGTH_LONG).show();
 
-                                    startActivity(new Intent(SignUpActivity.this, SignInActivity.class));
+                                        startActivity(new Intent(SignUpActivity.this, SignInActivity.class));
 
 
-                                    finish();
+                                        finish();
                                     } else {
                                         Toast.makeText(getApplicationContext(), "Login Error", Toast.LENGTH_LONG).show();
                                     }
@@ -114,7 +113,7 @@ public class SignUpActivity extends AppCompatActivity {
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Log.i(TAG,e.toString());
+                                    Log.i(TAG, e.toString());
 
                                 }
                             });

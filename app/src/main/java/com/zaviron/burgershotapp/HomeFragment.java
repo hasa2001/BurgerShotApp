@@ -1,11 +1,19 @@
 package com.zaviron.burgershotapp;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -40,6 +48,7 @@ public class HomeFragment extends Fragment {
     private SearchView searchView;
     private ProductAdapter productAdapter;
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -64,6 +73,7 @@ public class HomeFragment extends Fragment {
         itemView.setLayoutManager(gridLayoutManager);
         itemView.setAdapter(productAdapter);
 
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -87,6 +97,7 @@ public class HomeFragment extends Fragment {
                     switch (change.getType()) {
                         case ADDED:
                             products.add(product);
+
                         case MODIFIED:
                             break;
                         case REMOVED:
@@ -97,6 +108,8 @@ public class HomeFragment extends Fragment {
             }
         });
     }
+
+
 
     public void search(String text){
         firestore.collection("items").whereGreaterThanOrEqualTo("name",text).addSnapshotListener(new EventListener<QuerySnapshot>() {

@@ -1,5 +1,6 @@
 package com.zaviron.burgershotapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -44,37 +46,44 @@ public class OrdersFragment extends Fragment {
     public void onViewCreated(@NonNull View fragment, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(fragment, savedInstanceState);
         orders = new ArrayList<>();
-        RecyclerView recyclerView = fragment.findViewById(R.id.order_recycler_view);
-        OrdersAdapter ordersAdapter = new OrdersAdapter(orders, getContext());
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(ordersAdapter);
-
         user = FirebaseAuth.getInstance().getCurrentUser();
-        String user_id = user.getUid();
-        Log.i(TAG, user_id);
-        firestore = FirebaseFirestore.getInstance();
+        if (user !=null){
+            RecyclerView recyclerView = fragment.findViewById(R.id.order_recycler_view);
+            OrdersAdapter ordersAdapter = new OrdersAdapter(orders, getContext());
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+            recyclerView.setLayoutManager(linearLayoutManager);
+            recyclerView.setAdapter(ordersAdapter);
 
-        firestore.collection("orders").whereEqualTo("client_id", user_id).addSnapshotListener(new EventListener<QuerySnapshot>() {
 
-            @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+            String user_id = user.getUid();
+            Log.i(TAG, user_id);
+            firestore = FirebaseFirestore.getInstance();
 
-                for (DocumentChange change : value.getDocumentChanges()) {
-                    Orders order = change.getDocument().toObject(Orders.class);
-                    System.out.println(order.getOrder_id() + " " + order.getProduct_price() + " " + order.getProduct_id());
-                    switch (change.getType()) {
-                        case ADDED:
-                            orders.add(order);
-                        case MODIFIED:
-                            break;
-                        case REMOVED:
-                            orders.remove(order);
+            firestore.collection("orders").whereEqualTo("client_id", user_id).addSnapshotListener(new EventListener<QuerySnapshot>() {
+
+                @Override
+                public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+
+                    for (DocumentChange change : value.getDocumentChanges()) {
+                        Orders order = change.getDocument().toObject(Orders.class);
+                        System.out.println(order.getOrder_id() + " " + order.getProduct_price() + " " + order.getProduct_id());
+                        switch (change.getType()) {
+                            case ADDED:
+                                orders.add(order);
+                            case MODIFIED:
+                                break;
+                            case REMOVED:
+                                orders.remove(order);
+                        }
                     }
+                    ordersAdapter.notifyDataSetChanged();
                 }
-                ordersAdapter.notifyDataSetChanged();
-            }
-        });
+            });
+
+        }else {
+            startActivity(new Intent(getContext(), SignInActivity.class));
+            Toast.makeText(getContext(),"Please Sign In First",Toast.LENGTH_LONG).show();
+        }
 
     }
 }

@@ -17,8 +17,21 @@
             android:id="@+id/toolBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:navigationIcon="@drawable/baseline_menu_24_navigation_icon">
+            app:navigationIcon="@drawable/baseline_menu_24_navigation_icon"
+            android:background="@color/check_white"
+            >
+<RelativeLayout
+    android:layout_width="100dp"
+    android:layout_height="100dp"
+    android:layout_gravity="center">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        app:srcCompat="@drawable/shot_restaurant_long_logo" />
+
+</RelativeLayout>
 
         </com.google.android.material.appbar.MaterialToolbar>
 
@@ -28,14 +41,17 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
+
+
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
+            android:background="@color/check_white"
             app:itemIconTint="@drawable/bottom_nav_custom_icon"
             app:labelVisibilityMode="labeled"
             app:menu="@menu/bottom_navigation_menu" />
+
     </LinearLayout>
 
     <com.google.android.material.navigation.NavigationView

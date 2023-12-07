@@ -4,4 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".WishlistFragment"
-    android:id="@+id/wishlist"/>
+    android:id="@+id/wishlist">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/wishlistRecycleView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</FrameLayout>

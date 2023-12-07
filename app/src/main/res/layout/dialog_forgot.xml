@@ -2,11 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-
     android:id="@+id/forgotPasswordDialog"
-    >
+    android:layout_width="match_parent"
+
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/textView3"
@@ -14,11 +13,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:text="@string/forgotPassword"
+        android:textSize="17sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:textSize="17sp"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/forgotEmailField"
@@ -34,29 +32,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
-    <LinearLayout
-        android:layout_width="409dp"
+    <Button
+
+        android:id="@+id/forgotCancelBtn"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/forgotEmailField">
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:text="@string/cancel"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:backgroundTint="@color/orange"
+        app:layout_constraintStart_toStartOf="@+id/forgotEmailField"
+        app:layout_constraintTop_toBottomOf="@+id/forgotEmailField" />
 
-        <Button
-            android:id="@+id/forgotCancelBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:layout_weight="1"
-            android:text="@string/cancel" />
-
-        <Button
-            android:id="@+id/forgotResetBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:layout_weight="1"
-            android:text="@string/reset" />
-    </LinearLayout>
+    <Button
+        android:id="@+id/forgotResetBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:text="@string/reset"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/forgotEmailField"
+        app:layout_constraintTop_toBottomOf="@+id/forgotEmailField"
+        android:backgroundTint="@color/black"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
